@@ -1,25 +1,30 @@
 {
   "name": "chainstate-utxo-stream",
-  "description": "stream utxos from bitcoin core's chainstate leveldb",
-  "version": "0.0.0",
+  "description": "Stream unserialized utxos from bitcoin core's chainstate leveldb",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
   "repository": {
     "url": "git://github.com/challengerdeep/chainstate-utxo-stream.git"
   },
   "main": "index.js",
   "dependencies": {
-    "bitcoin-bufferlist": "^1.1.1",
     "bn.js": "^0.14.1",
-    "inherits": "^2.0.1",
     "msb128": "^1.0.0",
-    "readable-stream": "^1.0.32",
     "through2": "^0.6.3"
   },
   "devDependencies": {
-    "bitcoin": "^2.2.0",
     "level": "^0.18.0",
-    "through2-map": "^1.4.0",
-    "through2-spy": "^1.2.0"
+    "list-stream": "^1.0.0",
+    "tape": "^3.0.1"
   },
+  "keywords": [
+    "utxo",
+    "stream",
+    "bitcoin",
+    "chainstate"
+  ],
   "license": "MIT",
   "author": "Stanislas Marion <stanislas.marion@gmail.com> (http://github.com/czzarr)"
 }
