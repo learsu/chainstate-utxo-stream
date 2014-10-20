@@ -14,7 +14,7 @@ test('Testing utxo unserializing stream', function (t) {
     .pipe(ListStream.obj(function (err, data) {
       if (err)
         throw err
-      t.equal(data.length, 291)
+      t.equal(data.length, 293)
     }))
 
 })
@@ -29,6 +29,9 @@ inherits(FixtureStream, Readable)
 
 var i = 0
 var tx = [
+  { key: new Buffer('6300170475112200e8b1544545949ad14fd81d475fdc12813582262096f6f7914d', 'hex'),
+    value: new Buffer('0106b9c1ddd25b002fdb00687f9d3d34b254b2d48b6ef8751afcf46ce8e0e2dd1d003820cf89fd3f6c27d0dc39620aa3f620c58df03681d110', 'hex')
+  },
   { key: new Buffer('6300000136ea56f3b0ee8fbb13059cbd4521ba38074fd9832a86f4335cd7d2267c', 'hex'),
     value: new Buffer('010332003bf58224ccd41bd4c94bf0d4a711fc4e1187887c80b021', 'hex')
   },

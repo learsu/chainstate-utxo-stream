@@ -17,14 +17,13 @@ function utxoStream () {
     // code
     var code = msb.read(stx.slice(off))
     off += code.off
-    code = code.res
-    var coinbase = (code & 1) != 0
+    code = parseInt(code.res, 10)
+
+    // unspentness
     var unspentness = []
     unspentness[0] = (code & 2) != 0
     unspentness[1] = (code & 4) != 0
     var nBytes = (code >> 3) + ((code & 6) != 0 ? 0 : 1)
-
-    // unspentness
     if (nBytes > 0) {
       var bytes = stx.slice(off, off + nBytes)
       off += nBytes
@@ -54,8 +53,10 @@ function utxoStream () {
 }
 
 // see https://github.com/bitcoin/bitcoin/blob/e8f6d54f1f58d9a5998e37367b84b427e51e1ad7/src/core.cpp
+// x is expected to be a BN
 function decompressAmount (x) {
-  x = new bn(x)
+  if (!(x instanceof bn))
+    throw new Error('not a bn')
   // x = 0  OR  x = 1+10*(9*n + d - 1) + e  OR  x = 1+10*(n - 1) + 9
   if (x.cmpn(0) === 0)
       return 0

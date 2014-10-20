@@ -1,7 +1,7 @@
 {
   "name": "chainstate-utxo-stream",
   "description": "Stream unserialized utxos from bitcoin core's chainstate leveldb",
-  "version": "1.0.1",
+  "version": "2.0.1",
   "scripts": {
     "test": "tape test/*.js"
   },
