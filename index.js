@@ -57,6 +57,9 @@ function utxoStream () {
         off += 1
         //console.log('type', txOut.type);
         var size = getTypeSize(txOut.type)
+        // skip non-standard transactions for now
+        if (size === 0)
+          continue
         txOut.address = stx.slice(off, off + size)
         //console.log('address', txOut.address);
         this.push(txOut)
