@@ -48,7 +48,7 @@ function utxoStream () {
     for (var i = 0; i < unspentness.length; i++) {
       if (unspentness[i]) {
         var txOut = {}
-        //console.log('stx', stx.slice(off, off+30).toString('hex'));
+        //console.log('stx', stx.slice(off, off + 30).toString('hex'));
         var amount = msb.read(stx.slice(off))
         //console.log('amount', amount.res.toString(), off);
         txOut.amount = decompressAmount(amount.res)
@@ -59,7 +59,7 @@ function utxoStream () {
         var size = getTypeSize(txOut.type)
         // skip non-standard transactions for now
         if (size === 0)
-          continue
+          break
         txOut.address = stx.slice(off, off + size)
         //console.log('address', txOut.address);
         this.push(txOut)
