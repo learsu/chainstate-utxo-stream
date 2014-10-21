@@ -29,6 +29,10 @@ inherits(FixtureStream, Readable)
 
 var i = 0
 var tx = [
+  // this one is non-standard, doesn't work for now because needs a script parser.
+  //{ key: new Buffer('6322300a976c1f0f6bd6172ded8cb76c23f6e57d3b19e9ff1f403990e70acf1956', 'hex'),
+    //value: new Buffer('01123001816e1fa7011414da39a3ee5e6b4b0d3255bfef95601890afd8070987600b630150685184560c6301ee675168837c1fa6011414f71c27109c692c1b56bbdceb5b9d2865b3708dbc878310', 'hex')
+  //},
   { key: new Buffer('6300170475112200e8b1544545949ad14fd81d475fdc12813582262096f6f7914d', 'hex'),
     value: new Buffer('0106b9c1ddd25b002fdb00687f9d3d34b254b2d48b6ef8751afcf46ce8e0e2dd1d003820cf89fd3f6c27d0dc39620aa3f620c58df03681d110', 'hex')
   },

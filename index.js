@@ -1,6 +1,7 @@
 var bn = require('bn.js')
 var msb = require('msb128')
 var through = require('through2')
+//require('buffertools').extend()
 
 module.exports = utxoStream
 
@@ -9,13 +10,17 @@ module.exports = utxoStream
 function utxoStream () {
   return through.obj(function (chunk, enc, done) {
     var stx = chunk.value
+    //console.log('key', chunk.key.reverse().toString('hex'));
+    //console.log(stx.toString('hex'));
 
     // version
     var version = msb.read(stx)
+    //console.log('version', version.res);
     var off = version.off
 
     // code
     var code = msb.read(stx.slice(off))
+    //console.log('code', code.res.toString(), code.off);
     off += code.off
     code = parseInt(code.res, 10)
 
@@ -23,9 +28,12 @@ function utxoStream () {
     var unspentness = []
     unspentness[0] = (code & 2) != 0
     unspentness[1] = (code & 4) != 0
+    //console.log(unspentness);
     var nBytes = (code >> 3) + ((code & 6) != 0 ? 0 : 1)
+    //console.log('nBytes', nBytes);
     if (nBytes > 0) {
       var bytes = stx.slice(off, off + nBytes)
+      //console.log('bytes', bytes.toString('hex'));
       off += nBytes
 
       for (var j = 0; j < nBytes; j++) {
@@ -34,18 +42,25 @@ function utxoStream () {
         }
       }
     }
+    //console.log(unspentness);
 
     // txouts themselves
     for (var i = 0; i < unspentness.length; i++) {
       if (unspentness[i]) {
         var txOut = {}
+        //console.log('stx', stx.slice(off, off+30).toString('hex'));
         var amount = msb.read(stx.slice(off))
+        //console.log('amount', amount.res.toString(), off);
         txOut.amount = decompressAmount(amount.res)
         off += amount.off
         txOut.type = stx.readUInt8(off)
-        txOut.address = stx.slice(off + 1, off + 21) // an address is 20 bytes
+        off += 1
+        //console.log('type', txOut.type);
+        var size = getTypeSize(txOut.type)
+        txOut.address = stx.slice(off, off + size)
+        //console.log('address', txOut.address);
         this.push(txOut)
-        off += 21
+        off += size
       }
     }
     done()
@@ -80,4 +95,12 @@ function decompressAmount (x) {
       e--
   }
   return n.toString()
+}
+
+function getTypeSize (n) {
+  if (n == 0 || n == 1)
+      return 20
+  if (n == 2 || n == 3 || n == 4 || n == 5)
+      return 32
+  return 0;
 }
