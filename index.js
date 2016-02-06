@@ -11,8 +11,8 @@ module.exports = utxoStream
 // for an explanation of the serializing algorithm
 var current
 process.on('uncaughtException', function (err) {
-  console.log(err)
-  console.log(current)
+  console.err(err)
+  console.err(current)
 })
 var count = 0
 function utxoStream () {
@@ -30,7 +30,7 @@ function utxoStream () {
     // console.log('version', version.res);
     var off = version.off
     count++
-      if (count % 1000 === 0) console.log(count)
+    // if (count % 1000 === 0) console.log(count)
 
     // code
     var code = msb.read(stx.slice(off))

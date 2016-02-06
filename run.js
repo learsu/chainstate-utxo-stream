@@ -9,6 +9,18 @@ rs.pipe(utxoStream())
   .pipe(through.obj(function (chunk, enc, done) {
     chunk.forEach(function (txOut) {
       txOut.txHash = txOut.txHash.toString('hex')
+      formatCQL(txOut)
     })
     done()
   }))
+
+function formatCQL (txOut) {
+  txOut.addresses.forEach(function (address) {
+    if (!txOut.txHash) console.log(txOut)
+    console.log('%s, %d, 0x%s, %d, %d', address, txOut.idx, txOut.txHash, txOut.height, txOut.amount)
+  })
+}
+
+process.on('uncaughtException', function (err) {
+  console.err(err)
+})
