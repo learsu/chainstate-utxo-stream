@@ -2,7 +2,7 @@ var bcoin = require('bcoin-core')
 var bn = require('bn.js')
 var level = require('level')
 var msb = require('msb128')
-var db = level('/Volumes/bitcoin/chainstate', { keyEncoding: 'hex', valueEncoding: 'hex' })
+var db = level('./chainstate', { keyEncoding: 'hex', valueEncoding: 'hex' })
 // db.get(new Buffer('630406ddee3f1a6d8bdf321cc069c67c063add04d93423111bed2a5d9a7a7619e1', 'hex'), function (err, res) {
 // db.get(new Buffer('6300d2138f1b85666a4e30a156ede6b4a11a27f202e77ea69565ead9101552cdda', 'hex'), function (err, res) {
   // console.log(err, res.toString('hex'))
@@ -22,19 +22,16 @@ function decodeThatShit(buf) {
   unspentness[1] = (code & 4) != 0
   console.log(unspentness)
   var nBytes = (code >> 3) + ((code & 6) != 0 ? 0 : 1)
-  nBytes++
-  console.log(nBytes)
-  if (nBytes > 0) {
-    var bytes = buf.slice(off, off + nBytes)
-    console.log('bytes', bytes.toString('hex'));
-    // console.log('bytes', buf.slice(off, off + nBytes).toString('hex'))
-    for (var j = 0; j < nBytes; j++) {
-      for (var p = 0; p < 8; p++) {
-        unspentness.push((bytes[j] & (1 << p)) != 0)
-      }
+  console.log('nBytes',nBytes)
+  while (nBytes > 0) {
+    var chAvail = buf.readUInt8(off)
+    for (var p = 0; p < 8; p++) {
+      var f = (chAvail & (1 << p)) != 0
+      unspentness.push(f)
     }
+    off++
+    if (chAvail !== 0) nBytes--
   }
-  off += nBytes
   console.log('unspentness length', unspentness.length);
   console.log(unspentness)
 }
@@ -45,15 +42,12 @@ function getBuf(str, cb) {
   db.get(new Buffer('63'+bcoin.utils.revHex(str), 'hex'), function (err, res) {
     console.log(bcoin.utils.revHex(str))
     console.log(err, res.toString('hex'))
-    cb(res)
+    cb(new Buffer(res, 'hex'))
   })
 }
-getBuf('7a18fb8e8b233319746a67f2b5c7dc0cce13e31270867dd915cefae9cb06f1e3', function (b) {
+getBuf(process.argv[2], function (b) {
   decodeThatShit(b)
 })
-// db.createReadStream({ gte: '\x42', lt: '\x43' }).on('data', function (data) {
-  // console.log(bcoin.utils.revHex(data.value.toString('hex')))
-// })
 console.log(decompressAmount(msb.read(new Buffer('05', 'hex')).res))
 function decompressAmount (x) {
   if (!(x instanceof bn))
@@ -82,3 +76,101 @@ function decompressAmount (x) {
   }
   return n.toString()
 }
+
+vout = [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  false,
+  false,
+]
+
+function calcMaskSize(nBytes, nNonZeroBytes) {
+  var nLastUsedByte = 0
+  for (var b = 0; 2 + b*8 < vout.length; b++) {
+    var fZero = true
+    for (var i = 0; (i < 8) && (2 + b*8 + i) < vout.length; i++) {
+      if (vout[2+b*8+i]) {
+        fZero = false
+        continue
+      }
+    }
+    if (!fZero) {
+      nLastUsedByte = b+1
+      nNonZeroBytes++
+    }
+  }
+  nBytes += nLastUsedByte
+  console.log(nBytes, nNonZeroBytes)
+  return nBytes
+}
+// calcMaskSize(0, 0)
+function computeSpentnessBitmask (nMaskSize) {
+  var bitmask = []
+  for (b = 0; b < nMaskSize; b++) {
+    var chAvail = 0
+    for (var i = 0; (i < 8) && (2+b*8+i) < vout.length; i++) {
+      if (vout[2+b*8+i]) {
+        chAvail |= (1 << i)
+      }
+    }
+    bitmask.push(chAvail)
+  }
+  console.log('bitmask', bitmask)
+  return bitmask
+}
+// computeSpentnessBitmask(6)
+function computeSpentnessBitvector(bitmask, nMaskCode) {
+  while (nMaskCode > 0) {
+    var chAvail = bitmask.shift()
+    console.log(chAvail)
+    if (chAvail !== 0) nMaskCode--
+  }
+}
+// computeSpentnessBitvector(computeSpentnessBitmask(6), 5)
