@@ -15,3 +15,8 @@ rs.pipe(us())
   .pipe( // do what you want here )
 
 ```
+
+# CLI example
+```sh
+node run.js | ../cassandra-loader/build/cassandra-loader -f stdin -host 127.0.0.1 -schema "mainnet.addresses_utxos(a_hash,idx,t_hash,b_height,value)" -progressRate 10000
+```
