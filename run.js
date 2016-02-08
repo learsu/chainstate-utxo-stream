@@ -17,7 +17,7 @@ rs.pipe(utxoStream())
 function formatCQL (txOut) {
   txOut.addresses.forEach(function (address) {
     if (!txOut.txHash) console.log(txOut)
-    console.log('%s, %d, 0x%s, %d, %d', address, txOut.idx, txOut.txHash, txOut.height, txOut.amount)
+    console.log('%s, %d, 0x%s, %s, %d, %d', address, txOut.idx, txOut.txHash, txOut.type, txOut.height, txOut.amount)
   })
 }
 

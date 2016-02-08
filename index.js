@@ -78,15 +78,18 @@ function utxoStream () {
         switch(type) {
           case 0:
             txOut.addresses = [bcoin.utils.hash2addr(hashOrKey, 'mainnet')]
+            txOut.type = 'pubkeyhash'
             break
           case 1:
             txOut.addresses = [bcoin.utils.hash2scriptaddr(hashOrKey, 'mainnet')]
+            txOut.type = 'scripthash'
             break
           case 2:
           case 3:
             // add the prefix which is exactly the type
             var pubkey = Buffer.concat([new Buffer([type]), hashOrKey])
             txOut.addresses = [bcoin.utils.hash2addr(bcoin.utils.ripesha(pubkey), 'mainnet')]
+            txOut.type = 'pubkey'
             break
           case 4:
           case 5:
@@ -96,6 +99,7 @@ function utxoStream () {
             pubkey = new Buffer(ec.keyFromPublic(pubkey).getPublic('hex'), 'hex')
             // get address
             txOut.addresses = [bcoin.utils.hash2addr(bcoin.utils.ripesha(pubkey), 'mainnet')]
+            txOut.type = 'pubkey'
             break
           default:
             // not a special type
@@ -104,6 +108,7 @@ function utxoStream () {
             var outputType = bcoin.script.getOutputType(hashOrKey)
             if (outputType && outputType !== 'nulldata') {
               txOut.addresses = bcoin.script.getAddressesByType(bcoin.script.decode(hashOrKey), { type: outputType, is_output: true, network: 'mainnet'})
+              txOut.type = outputType
             } else {
               off += size
               continue parsingtxouts
