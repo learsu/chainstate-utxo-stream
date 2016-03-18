@@ -17,6 +17,7 @@ rs.pipe(us())
 ```
 
 # CLI example
+BE CAREFUL: make a local copy of the chainstate db first, otherwise you will corrupt the db.
 ```sh
 node run.js | ../cassandra-loader/build/cassandra-loader -f stdin -host
 127.0.0.1 -schema "mainnet.addresses_utxos(a_hash,idx,t_hash,type,b_height,value)" -progressRate 10000
